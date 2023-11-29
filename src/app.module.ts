@@ -15,7 +15,7 @@ import { User } from './users/users.model';
       models: [User],
       autoLoadModels: true,
       synchronize: true,
-      sync: { force: true },
+      sync: { force: false },
     }),
     UsersModule,
   ],

@@ -3,3 +3,8 @@ export class CreateUserDto {
   lastName: string;
   age: number;
 }
+export class UpdateUserDto {
+  firstName: string;
+  lastName: string;
+  age: number;
+}
