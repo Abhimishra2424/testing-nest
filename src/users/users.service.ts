@@ -2,13 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateUserDto, UpdateUserDto } from './dto/create-user.dto';
 import { User } from './users.model';
+import { Note } from 'src/note/note.model';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectModel(User)
-    private readonly userModel: typeof User,
-  ) {}
+  constructor(@InjectModel(User) private readonly userModel: typeof User) {}
 
   create(createUserDto: CreateUserDto): Promise<User> {
     return this.userModel.create({
@@ -19,7 +17,9 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return this.userModel.findAll();
+    return this.userModel.findAll({
+      include: [Note], // Include the Note model
+    });
   }
 
   findOne(id: string): Promise<User> {
@@ -27,6 +27,7 @@ export class UsersService {
       where: {
         id,
       },
+      include: [Note], // Include the Note model
     });
   }
 
