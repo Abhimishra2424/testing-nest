@@ -18,6 +18,7 @@ import { Note } from './note/note.model';
       autoLoadModels: true,
       synchronize: true,
       sync: { force: false },
+      logging: true,
     }),
     UsersModule,
     NoteModule,
