@@ -1,20 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { InjectModel } from '@nestjs/sequelize';
-import { CreateUserDto, UpdateUserDto } from './dto/create-user.dto';
 import { User } from './users.model';
 import { Note } from 'src/note/note.model';
-import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User) private readonly userModel: typeof User) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const existingUser = await this.userModel.findOne({
-      where: {
-        email: createUserDto.email,
-      },
-    });
+    const existingUser = await this.findByEmail(createUserDto.email);
     if (existingUser) {
       throw new Error('User with this email already exists');
     }
@@ -33,21 +30,26 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return this.userModel.findAll({
+    return await this.userModel.findAll({
       include: [Note], // Include the Note model
     });
   }
 
-  findOne(id: string): Promise<User> {
-    return this.userModel.findOne({
+  async findOne(id: number): Promise<User> {
+    const user = await this.userModel.findOne({
       where: {
         id,
       },
       include: [Note], // Include the Note model
     });
+    if (!user) {
+      throw new NotFoundException('User Not Found');
+    } else {
+      return user;
+    }
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
     if (user) {
       await this.userModel.update(updateUserDto, { where: { id } });
@@ -55,13 +57,13 @@ export class UsersService {
     }
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     const user = await this.findOne(id);
     await user.destroy();
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.userModel.findOne({
+    return await this.userModel.findOne({
       where: {
         email: email,
       },
@@ -69,6 +71,6 @@ export class UsersService {
   }
 
   async findById(id: number): Promise<User | null> {
-    return this.userModel.findByPk(id);
+    return await this.userModel.findByPk(id);
   }
 }

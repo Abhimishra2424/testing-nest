@@ -4,10 +4,13 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
+  ValidationPipe,
   Patch,
   Post,
 } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.model';
 import { UsersService } from './users.service';
 
@@ -16,7 +19,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
+  create(@Body(ValidationPipe) createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.create(createUserDto);
   }
 
@@ -26,20 +29,20 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<User> {
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.usersService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ValidationPipe) updateUserDto: UpdateUserDto,
   ): Promise<User> {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.usersService.remove(id);
   }
 }
