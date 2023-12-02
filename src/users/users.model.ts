@@ -10,6 +10,12 @@ export class User extends Model {
   lastName: string;
 
   @Column
+  email: string;
+
+  @Column
+  password: string;
+
+  @Column
   age: number;
 
   @Column({ defaultValue: true })
